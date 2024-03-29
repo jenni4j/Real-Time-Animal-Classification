@@ -1,4 +1,5 @@
 import time
+import os
 
 import torch
 import numpy as np
@@ -7,10 +8,14 @@ from torchvision import models, transforms
 import cv2
 from PIL import Image
 
-# Read in the ImageNet classes text file
-with open("classes.txt", "r") as file:
-    classes = file.read().splitlines()
+import pvorca
 
+# Set up Orca (Picovoice) access key
+orca = pvorca.create(access_key='')
+
+# Read in the ImageNet classes text file
+with open("imagenet_classes.txt", "r") as file:
+    classes = file.read().splitlines()
 
 torch.backends.quantized.engine = 'qnnpack'
 
@@ -25,6 +30,7 @@ preprocess = transforms.Compose([
 ])
 
 net = models.quantization.mobilenet_v2(pretrained=True, quantize=True)
+
 # jit model to take it from ~20fps to ~30fps
 net = torch.jit.script(net)
 
@@ -51,7 +57,6 @@ with torch.no_grad():
 
         # run model
         output = net(input_batch)
-        # do something with output ...
 
         # log model performance
         frame_count += 1
@@ -66,3 +71,7 @@ with torch.no_grad():
         top.sort(key=lambda x: x[1], reverse=True)
         for idx, val in top[:1]:
             print(f"{val.item()*100:.2f}% {classes[idx]}")
+            best_guess = classes[idx]
+            print(best_guess)
+            test = 'notebook'
+            orca.synthesize_to_file(test, os.getcwd())
