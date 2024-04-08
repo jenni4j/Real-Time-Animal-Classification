@@ -4,6 +4,8 @@ import os
 import torch
 import numpy as np
 from torchvision import models, transforms
+from torchvision.models.mobilenetv2 import MobileNet_V2_QuantizedWeights
+
 
 import cv2
 from PIL import Image
@@ -29,7 +31,7 @@ preprocess = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
-net = models.quantization.mobilenet_v2(pretrained=True, quantize=True)
+net = models.quantization.mobilenet_v2(weights=MobileNet_V2_QuantizedWeights, quantize=True)
 
 # jit model to take it from ~20fps to ~30fps
 net = torch.jit.script(net)
