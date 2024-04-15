@@ -10,11 +10,6 @@ from torchvision.models.mobilenetv2 import MobileNet_V2_QuantizedWeights
 import cv2
 from PIL import Image
 
-import pvorca
-
-# Set up Orca (Picovoice) access key
-orca = pvorca.create(access_key='')
-
 # Read in the ImageNet classes text file
 with open("imagenet_classes.txt", "r") as file:
     classes = file.read().splitlines()
@@ -73,7 +68,4 @@ with torch.no_grad():
         top.sort(key=lambda x: x[1], reverse=True)
         for idx, val in top[:1]:
             print(f"{val.item()*100:.2f}% {classes[idx]}")
-            best_guess = classes[idx]
-            print(best_guess)
-            test = 'notebook'
-            orca.synthesize_to_file(test, os.getcwd())
+            
